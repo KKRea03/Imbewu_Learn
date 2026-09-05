@@ -9,11 +9,8 @@
 // The service-role key must NEVER appear in this file or anywhere in
 // the browser; it only lives in the Edge Functions' environment.
 
-const SUPABASE_URL = "https://jswsdmqmmzhsewnqvsst.supabase.co";
-
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impzd3NkbXFtbXpoc2V3bnF2c3N0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY4MDE4OTgsImV4cCI6MjEwMjM3Nzg5OH0.iA_X8wgfEpWxmvbAM6mCuB9aFNbHmp18JKeXWCFD9yw";
-
-
+const SUPABASE_URL = "https://YOUR-PROJECT-REF.supabase.co";
+const SUPABASE_ANON_KEY = "YOUR-PUBLIC-ANON-KEY";
 
 // Loaded via the Supabase JS CDN script tag included on every page:
 // <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
