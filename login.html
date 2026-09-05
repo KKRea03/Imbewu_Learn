@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Log In — Imbewu Learn</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<header class="navbar">
+  <a href="index.html" class="logo"><span>&#127793;</span>Imbewu Learn</a>
+  <ul class="nav-links"><li><a href="index.html">Home</a></li></ul>
+  <div class="nav-buttons"></div>
+</header>
+
+<section class="page-hero">
+  <p class="eyebrow">WELCOME BACK</p>
+  <h1>Continue to <span>Imbewu Learn</span></h1>
+  <p>Sign in with Google to access your learner, educator, or knowledge keeper dashboard.</p>
+</section>
+
+<div style="display:flex; justify-content:center; padding-bottom:100px;">
+  <div class="auth-widget">
+    <button id="googleSignInBtn" class="google-button">
+      <span class="google-icon">G</span> Continue with Google
+    </button>
+    <div class="auth-message" id="authMessage"></div>
+    <p class="auth-signup-link">
+      There's no separate sign-up — your first Google sign-in creates your account automatically.
+    </p>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/supabase.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/role.js"></script>
+<script>
+// If already signed in, skip straight to the right dashboard.
+(async () => {
+  const user = await getCurrentUser();
+  if (user) {
+    const profile = await getOrCreateProfile(user);
+    if (profile) redirectToOwnDashboard(profile.role);
+  }
+})();
+
+document.getElementById("googleSignInBtn").addEventListener("click", async () => {
+  const btn = document.getElementById("googleSignInBtn");
+  const msg = document.getElementById("authMessage");
+  btn.disabled = true;
+  msg.textContent = "";
+  msg.className = "auth-message";
+  try {
+    await signInWithGoogle(appUrl("index.html"));
+  } catch (err) {
+    msg.textContent = err.message;
+    msg.className = "auth-message error";
+    btn.disabled = false;
+  }
+});
+</script>
+</body>
+</html>

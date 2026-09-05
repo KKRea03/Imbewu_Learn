@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Imbewu Learn — Preserving Indigenous Knowledge</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<header class="navbar">
+  <a href="index.html" class="logo"><span>&#127793;</span>Imbewu Learn</a>
+  <ul class="nav-links" id="publicNav">
+    <li><a href="index.html" class="active">Home</a></li>
+    <li><a href="learner/lessons.html">Explore</a></li>
+  </ul>
+  <div class="nav-buttons" id="navButtons">
+    <a href="login.html" class="btn-outline">Log In</a>
+    <a href="login.html" class="btn-primary">Start Learning</a>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="hero-content">
+    <p class="eyebrow">PRESERVING &middot; EDUCATING &middot; CONNECTING</p>
+    <h1>Imbewu <span>Learn</span></h1>
+    <p class="hero-description">
+      Preserving knowledge. Empowering learners. Connecting generations.
+      Imbewu Learn brings indigenous knowledge keepers, educators, and
+      learners together — verified knowledge shared through voice,
+      turned into lessons, quizzes, and translations by AI, so it can
+      reach further without losing what makes it true.
+    </p>
+    <div class="hero-buttons">
+      <a href="#" id="startLearningBtn" class="btn-primary">Start Learning</a>
+      <a href="#" id="shareKnowledgeBtn" class="btn-outline">Share Knowledge</a>
+    </div>
+  </div>
+
+  <div class="hero-image" id="authArea">
+    <!-- Auth widget or authenticated hub renders here -->
+    <div class="auth-widget">
+      <p class="eyebrow">GET STARTED</p>
+      <h3 style="margin-bottom: 15px;">Sign in to continue</h3>
+      <button id="googleSignInBtn" class="google-button">
+        <span class="google-icon">G</span> Continue with Google
+      </button>
+      <div class="auth-message" id="authMessage"></div>
+    </div>
+  </div>
+</section>
+
+<section class="intro">
+  <div>
+    <p class="eyebrow">WHY IMBEWU LEARN</p>
+    <h2>Knowledge shouldn't have to be lost to be learned from.</h2>
+  </div>
+  <div>
+    <p>Educators and knowledge keepers hold generations of lived experience — in medicine, agriculture, craft, story, and custom. Imbewu Learn gives that knowledge a verified, respectful path to learners everywhere.</p>
+    <p>Every submission is reviewed by a trusted Knowledge Keeper before anything is published, and only verified knowledge is ever turned into a lesson.</p>
+  </div>
+</section>
+
+<section class="how-section">
+  <div class="section-heading">
+    <p class="eyebrow">HOW IT WORKS</p>
+    <h2>From a spoken memory to a structured lesson.</h2>
+  </div>
+  <div class="how-grid">
+    <div class="how-card">
+      <p class="number">01</p>
+      <h3>Share</h3>
+      <p>An educator records their knowledge directly in the browser, or uploads a recording, and submits it for review.</p>
+    </div>
+    <div class="how-card featured">
+      <p class="number">02</p>
+      <h3>Verify</h3>
+      <p>A Knowledge Keeper listens, reviews the transcription and metadata, and approves or rejects the submission.</p>
+    </div>
+    <div class="how-card">
+      <p class="number">03</p>
+      <h3>Learn</h3>
+      <p>Approved knowledge is turned into a lesson, summary, quiz, and translation — ready for learners to explore.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <a href="index.html" class="logo"><span>&#127793;</span>Imbewu Learn</a>
+  <p>&copy; <span id="year"></span> Imbewu Learn. Preserving knowledge, empowering learners.</p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/supabase.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/role.js"></script>
+<script>
+document.getElementById("year").textContent = new Date().getFullYear();
+
+const DASHBOARD_BY_ROLE_LOCAL = {
+  learner: appUrl("learner/dashboard.html"),
+  educator: appUrl("educator/dashboard.html"),
+  knowledge_keeper: appUrl("knowledge-keeper/dashboard.html"),
+};
+
+async function init() {
+  const user = await getCurrentUser();
+
+  document.getElementById("startLearningBtn").addEventListener("click", (e) => {
+    e.preventDefault();
+    window.location.href = user ? appUrl("learner/dashboard.html") : appUrl("login.html");
+  });
+  document.getElementById("shareKnowledgeBtn").addEventListener("click", (e) => {
+    e.preventDefault();
+    window.location.href = user ? appUrl("educator/share.html") : appUrl("login.html");
+  });
+
+  if (!user) return; // show the sign-in widget already in the DOM
+
+  const profile = await getOrCreateProfile(user);
+  if (!profile) return;
+
+  // Swap top-right buttons for a quick dashboard link + logout.
+  document.getElementById("navButtons").innerHTML = `
+    <a href="${DASHBOARD_BY_ROLE_LOCAL[profile.role]}" class="btn-outline">My Dashboard</a>
+    <button class="btn-primary" id="headerLogoutBtn">Log Out</button>
+  `;
+  document.getElementById("headerLogoutBtn").addEventListener("click", signOut);
+
+  // Replace the hero auth widget with a personalized hub.
+  const firstName = (profile.full_name || profile.email || "there").split(" ")[0];
+  document.getElementById("authArea").innerHTML = `
+    <div class="auth-widget">
+      <p class="hub-welcome">Welcome back, ${firstName}</p>
+      <div class="hub-cards">
+        <a class="hub-card" href="${appUrl("learner/dashboard.html")}">
+          <span class="hub-icon">&#128218;</span>
+          <strong>Learn</strong>
+          <small>Browse lessons and quizzes</small>
+        </a>
+        <a class="hub-card" href="${appUrl("educator/share.html")}">
+          <span class="hub-icon">&#127908;</span>
+          <strong>Share</strong>
+          <small>Contribute your knowledge</small>
+        </a>
+        ${profile.role === "knowledge_keeper" ? `
+        <a class="hub-card" href="${appUrl("knowledge-keeper/dashboard.html")}">
+          <span class="hub-icon">&#9989;</span>
+          <strong>Review</strong>
+          <small>Moderate submissions</small>
+        </a>` : ""}
+      </div>
+    </div>
+  `;
+}
+
+document.getElementById("googleSignInBtn").addEventListener("click", async () => {
+  const btn = document.getElementById("googleSignInBtn");
+  const msg = document.getElementById("authMessage");
+  btn.disabled = true;
+  msg.textContent = "";
+  msg.className = "auth-message";
+  try {
+    await signInWithGoogle(appUrl("index.html"));
+  } catch (err) {
+    msg.textContent = err.message;
+    msg.className = "auth-message error";
+    btn.disabled = false;
+  }
+});
+
+init();
+</script>
+</body>
+</html>
